@@ -8,12 +8,17 @@ const Manager = () => {
   const [form, setform] = useState({ site: "", username: "", password: "" })
   const [passwordsArray, setpasswordsArray] = useState([])
 
+const getpasswords =async ()=>{
+  let req = await fetch("http://localhost:3000/")
+  let passwords = await req.json()
+    setpasswordsArray(passwords)
+    console.log(passwords)
+    setpasswordsArray(passwords)
+}
+
   useEffect(() => {
-    let passwords = localStorage.getItem("passwords")
-    if (passwords) {
-      // alert("ALready Exists Password")
-      setpasswordsArray(JSON.parse(passwords))
-    }
+    getpasswords()
+   
   }, [])
 
   const showPasssword = () => {
@@ -40,10 +45,15 @@ const Manager = () => {
     });
   }
 
-  const savePassword = (e) => {
+  const savePassword = async(e) => {
    if (form.site!=="" && form.username!=="" && form.password!=="") {
+//if any such id exists in the db, delete it
+    await fetch("http://localhost:3000/",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:form.id})})
+
+
     setpasswordsArray([...passwordsArray, {...form,id:uuidv4()}])
-    localStorage.setItem("passwords", JSON.stringify([...passwordsArray, {...form,id:uuidv4()}]))
+    // localStorage.setItem("passwords", JSON.stringify([...passwordsArray, {...form,id:uuidv4()}]))
+    await fetch("http://localhost:3000/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,id:uuidv4()})})
     console.log(...passwordsArray, form)
     setform({ site: "", username: "", password: "" })
    
@@ -53,11 +63,12 @@ const Manager = () => {
 
   }
 
-  const deletePassword = (id) => {
+  const deletePassword = async(id) => {
     console.log(id)
     if (confirm("Are You Really Want To Delete This")) {
       setpasswordsArray(passwordsArray.filter(item=>item.id!==id))
-      localStorage.setItem("passwords", JSON.stringify(passwordsArray.filter(item=>item.id!==id)))
+      // localStorage.setItem("passwords", JSON.stringify(passwordsArray.filter(item=>item.id!==id)))
+      let res = await fetch("http://localhost:3000/",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})})
      
     }
     // console.log(...passwordsArray, form)
@@ -65,7 +76,7 @@ const Manager = () => {
   }
 
   const editPassword = (id) => {
-    setform(passwordsArray.filter(item=>item.id===id)[0])
+    setform({...passwordsArray.filter(item=>item.id===id)[0],id:id})
     setpasswordsArray(passwordsArray.filter(item=>item.id!==id))
 
   }
@@ -167,7 +178,7 @@ const Manager = () => {
                                     </td>
                                     <td className='py-2 border border-white text-center'>
                                         <div className='flex flex-col md:flex-row items-center justify-center '>
-                                            <span>{item.password}</span>
+                                            <span>{"*".repeat(item.password.length)}</span>
                                             <div className='lordiconcopy size-7 cursor-pointer' onClick={() => { copytext(item.password) }}>
                                                 <lord-icon
                                                     style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "3px" }}
