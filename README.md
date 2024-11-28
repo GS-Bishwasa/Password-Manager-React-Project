@@ -5,17 +5,15 @@ A secure and user-friendly Password Manager application built with React. This p
 ## Features
 
 - **Secure Storage**: Safely store and manage passwords for various accounts.
-- **Password Generator**: Generate strong and secure passwords with customizable options.
-- **Search Functionality**: Quickly search for saved passwords by account name or tags.
 - **Responsive Design**: Fully responsive UI optimized for desktops, tablets, and mobile devices.
 - **Built with React**: Leverages React for a dynamic and seamless user experience.
 
 ## Technologies Used
 
-- **Frontend**: React, CSS Modules/Styled Components, Bootstrap
-- **State Management**: React Context API/Redux (if applicable)
-- **Backend**: Optional - Integrations for secure storage (e.g., Firebase, Node.js backend)
-- **Other Tools**: npm, Webpack, Babel
+- **Frontend**: React, CSS Modules/Styled Components, TailwindCSS
+- **State Management**: React Context API
+- **Backend**: Optional - Integrations for secure storage (e.g., Express, Node.js backend)
+- **Other Tools**: npm
 
 ## Getting Started
 
