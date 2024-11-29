@@ -1,56 +1,54 @@
 const express = require('express')
-const app = express()
-require('dotenv').config()
-// console.log(process.env.MONGO_URL) // remove this after you've confirmed it is working
-const port = 3000
+const dotenv = require('dotenv')
+const { MongoClient } = require('mongodb'); 
 const bodyparser = require('body-parser')
-const cors  = require("cors")
-app.use(bodyparser.json())
+const cors = require('cors')
 
-app.use(cors())
+dotenv.config()
 
-const { MongoClient } = require('mongodb');
 
-// or as an es module:
-// import { MongoClient } from 'mongodb'
-
-// Connection URL
-const url = 'mongodb://localhost:27017';
+// Connecting to the MongoDB Client
+const url = process.env.MONGO_URI;
 const client = new MongoClient(url);
-
-// Database Name
-const dbName = 'passop';
-
-
 client.connect();
 
+// App & Database
+const dbName = process.env.DB_NAME 
+const app = express()
+const port = 3000 
 
-app.get('/', async(req, res) => {
+// Middleware
+app.use(bodyparser.json())
+app.use(cors())
+
+
+// Get all the passwords
+app.get('/', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('passwords');
     const findResult = await collection.find({}).toArray();
-console.log('Found documents =>', findResult);
-  res.json(findResult)
+    res.json(findResult)
 })
 
-app.post('/', async(req, res) => {
-  const password = req.body
+// Save a password
+app.post('/', async (req, res) => { 
+    const password = req.body
     const db = client.db(dbName);
     const collection = db.collection('passwords');
     const findResult = await collection.insertOne(password);
-  res.send({success:true, result:findResult})
+    res.send({success: true, result: findResult})
 })
 
-//Delete Password
-app.delete('/', async(req, res) => {
-  const password = req.body
+// Delete a password by id
+app.delete('/', async (req, res) => { 
+    const password = req.body
     const db = client.db(dbName);
     const collection = db.collection('passwords');
     const findResult = await collection.deleteOne(password);
-  res.send({success:true, result:findResult})
+    res.send({success: true, result: findResult})
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`)
 
+app.listen(port, () => {
+    console.log(`Example app listening on  http://localhost:${port}`)
 })

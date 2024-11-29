@@ -45,30 +45,49 @@ const getpasswords =async ()=>{
     });
   }
 
-  const savePassword = async(e) => {
-   if (form.site!=="" && form.username!=="" && form.password!=="") {
-//if any such id exists in the db, delete it
-    await fetch("http://localhost:3000/",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:form.id})})
-
-
-    setpasswordsArray([...passwordsArray, {...form,id:uuidv4()}])
-    // localStorage.setItem("passwords", JSON.stringify([...passwordsArray, {...form,id:uuidv4()}]))
-    await fetch("http://localhost:3000/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,id:uuidv4()})})
-    console.log(...passwordsArray, form)
-    setform({ site: "", username: "", password: "" })
-   
-   }else{
-    alert("Please Fill All The Input Fields")
-   }
-
-  }
+  const savePassword = async (e) => {
+    if (form.site !== "" && form.username !== "" && form.password !== "") {
+      try {
+        // Generate a unique ID if none exists
+        const id = form.id || uuidv4();
+  
+        // Delete the previous record if updating an existing entry
+        if (form.id) {
+          await fetch("http://localhost:3000/", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: form.id }),
+          });
+        }
+  
+        // Add the new entry
+        const newEntry = { ...form, id };
+        setpasswordsArray((prevArray) => [...prevArray, newEntry]);
+  
+        await fetch("http://localhost:3000/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newEntry),
+        });
+  
+        // Reset the form after success
+        setform({ site: "", username: "", password: "" });
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert("Failed to save the password. Please try again.");
+      }
+    } else {
+      alert("Please Fill All The Input Fields");
+    }
+  };
+  
 
   const deletePassword = async(id) => {
     console.log(id)
     if (confirm("Are You Really Want To Delete This")) {
       setpasswordsArray(passwordsArray.filter(item=>item.id!==id))
       // localStorage.setItem("passwords", JSON.stringify(passwordsArray.filter(item=>item.id!==id)))
-      let res = await fetch("http://localhost:3000/",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})})
+      await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
      
     }
     // console.log(...passwordsArray, form)
